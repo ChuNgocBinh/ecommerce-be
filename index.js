@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+require('express-async-errors');
 const authRouter = require('./auth/auth.router');
 const handleError = require('./common/handleError');
 
