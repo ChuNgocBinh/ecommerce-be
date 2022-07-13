@@ -1,12 +1,17 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 require('express-async-errors');
-const authRouter = require('./auth/auth.router');
+const authRouter = require('./modules/auth/auth.router');
+const shopRouter = require('./modules/shop_account/shop_account.router');
 const handleError = require('./common/handleError');
 
 const app = express();
+app.use(cors());
 app.use(express.json());
+
 app.use('/api/auth', authRouter);
+app.use('/api/shop', shopRouter);
 
 app.use(handleError);
 

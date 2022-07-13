@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
-const HttpError = require('../common/httpError');
-const tokenProvider = require('../common/tokenProvider');
+const fastCsv = require('fast-csv');
+const HttpError = require('../../common/httpError');
+const tokenProvider = require('../../common/tokenProvider');
 const authModel = require('./auth.model');
 
 const createUserAdmin = async (req, res, next) => {
@@ -11,13 +12,12 @@ const createUserAdmin = async (req, res, next) => {
 
   const existedUser = await authModel.getUserAdminByEmail(email);
   if (existedUser) {
-    throw HttpError(400, 'Email existed');
+    throw new HttpError('Email existed', 400);
   }
 
   const newUser = await authModel.createUserAdmin({
-    name: username,
+    user_name: username,
     email,
-    phone_number: '123456789',
     password: hashPassword,
   });
 
@@ -31,28 +31,24 @@ const loginAdmin = async (req, res, next) => {
 
   const existedUser = await authModel.getUserAdminByEmail(email);
   if (!existedUser) {
-    throw HttpError(400, 'Account is not existed');
+    throw new HttpError('Account is not existed', 400);
   }
   const verifyPasswrd = bcrypt.compareSync(password, existedUser.password);
 
   if (!verifyPasswrd) {
-    throw HttpError(400, 'wrong pass word');
+    throw new HttpError('wrong pass word', 400);
   }
 
   const data = {
-    id: existedUser._id,
-    email: existedUser._email,
-    username: existedUser._username,
+    id: existedUser.id,
+    email: existedUser.email,
+    username: existedUser.user_name,
   };
 
   const token = tokenProvider.createToken(data);
 
   res.status(200).send({
-    data: {
-      id: existedUser._id,
-      username: existedUser.username,
-      email: existedUser.email,
-    },
+    data,
     token,
   });
 };
@@ -63,6 +59,7 @@ const createUser = async (req, res, next) => {
   const salt = bcrypt.genSaltSync(10);
   const hashPassword = bcrypt.hashSync(password, salt);
 
+  // tìm  user trong db
   const existedUser = await authModel.getUserAdminByEmail(email);
   if (existedUser) {
     throw new HttpError(400, 'Email existed');
@@ -109,9 +106,16 @@ const login = async (req, res, next) => {
   });
 };
 
+const exportUserCsv = async (req, res, next) => {
+  res.attachment('user.csv');
+  const result = await authModel.getlistUser();
+  res.pipe(fastCsv.format({ headers: true })).pipe(res);
+};
+
 module.exports = {
   createUserAdmin,
   loginAdmin,
   createUser,
   login,
+  exportUserCsv,
 };
