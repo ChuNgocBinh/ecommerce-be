@@ -1,4 +1,4 @@
-const db = require('../db/db_helper');
+const db = require('../../db/db_helper');
 
 const createUserAdmin = async (data) => {
   try {
@@ -17,8 +17,8 @@ const createUserAdmin = async (data) => {
 
 const getUserAdminByEmail = async (email) => {
   try {
-    const result = db('users_admin')
-      .select('id', 'user_name ', 'email', 'rule')
+    const result = await db('users_admin')
+      .select('id', 'user_name ', 'email', 'rule', 'password')
       .where({
         email,
       });
@@ -33,6 +33,7 @@ const createUser = async (data) => {
   try {
     const result = await db.transaction(async (trx) => {
       const res = await trx('users').insert(data);
+      console.log(res);
       if (res.length) {
         return true;
       }
@@ -47,7 +48,7 @@ const createUser = async (data) => {
 const getUserByEmail = async (email) => {
   try {
     const result = await db('users')
-      .select('id', 'user_name ', 'email', 'password')
+      .select('id', 'user_name ', 'email', 'password', 'phone_number', 'address', 'isActive')
       .where({
         email,
       });
@@ -58,9 +59,39 @@ const getUserByEmail = async (email) => {
   }
 };
 
+const getUserById = async (user_id) => {
+  try {
+    const result = await db('users')
+      .select(
+        'id',
+        'user_name',
+        'email',
+        'phone_number',
+        'address',
+      )
+      .where('id', user_id);
+    return result ? result[0] : null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const getlistUser = async () => {
+  try {
+    const result = await db('user')
+      .stream();
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   createUserAdmin,
   getUserAdminByEmail,
   createUser,
   getUserByEmail,
+  getUserById,
+  getlistUser,
 };
