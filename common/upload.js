@@ -10,10 +10,17 @@ const s3 = new S3({
   region: process.env.AWS_BUCKET_REGION,
 });
 
-// const uploadFile = (file)=>{
+const uploadFile = (file) => {
+  const params = {
+    Bucket: process.env.AWS_BUCKET_NAME,
+    Key: file.originalname,
+    Body: file.buffer,
+  };
 
-// }
+  return s3.upload(params).promise();
+};
 
 module.exports = {
   upload,
+  uploadFile,
 };

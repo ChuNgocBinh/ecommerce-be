@@ -48,7 +48,7 @@ const createUser = async (data) => {
 const getUserByEmail = async (email) => {
   try {
     const result = await db('users')
-      .select('id', 'user_name ', 'email', 'password')
+      .select('id', 'user_name ', 'email', 'password', 'phone_number', 'address', 'isActive')
       .where({
         email,
       });

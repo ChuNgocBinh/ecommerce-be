@@ -54,7 +54,9 @@ const loginAdmin = async (req, res, next) => {
 };
 
 const createUser = async (req, res, next) => {
-  const { username, email, password } = req.body;
+  const {
+    username, email, password, phoneNumber,
+  } = req.body;
 
   const salt = bcrypt.genSaltSync(10);
   const hashPassword = bcrypt.hashSync(password, salt);
@@ -68,7 +70,7 @@ const createUser = async (req, res, next) => {
   const newUser = await authModel.createUser({
     user_name: username,
     email,
-    phone_number: '123456789',
+    phone_number: phoneNumber,
     password: hashPassword,
   });
 
@@ -86,7 +88,6 @@ const login = async (req, res, next) => {
     throw new HttpError('Account is not existed', 400);
   }
   const verifyPasswrd = bcrypt.compareSync(password, existedUser.password);
-  console.log('verifyPasswrd', verifyPasswrd);
 
   if (!verifyPasswrd) {
     throw new HttpError('wrong password', 400);
@@ -96,11 +97,19 @@ const login = async (req, res, next) => {
     id: existedUser.id,
     email: existedUser.email,
     username: existedUser.user_name,
+    phone_number: existedUser.phone_number,
+    address: existedUser.address,
+    isActive: existedUser.isActive,
+  };
+  const dataToken = {
+    id: existedUser.id,
+    email: existedUser.email,
+    username: existedUser.user_name,
   };
 
-  const token = tokenProvider.createToken(data);
+  const token = tokenProvider.createToken(dataToken);
 
-  res.status(200).send({
+  res.send({
     data,
     token,
   });
