@@ -99,6 +99,7 @@ const login = async (req, res, next) => {
     username: existedUser.user_name,
     phone_number: existedUser.phone_number,
     address: existedUser.address,
+    profile_picture: existedUser.profile_picture,
     isActive: existedUser.isActive,
   };
   const dataToken = {
