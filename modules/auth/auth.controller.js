@@ -54,9 +54,7 @@ const loginAdmin = async (req, res, next) => {
 };
 
 const createUser = async (req, res, next) => {
-  const {
-    username, email, password, phoneNumber,
-  } = req.body;
+  const { username, email, password, phoneNumber } = req.body;
 
   const salt = bcrypt.genSaltSync(10);
   const hashPassword = bcrypt.hashSync(password, salt);
@@ -83,6 +81,7 @@ const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   const existedUser = await authModel.getUserByEmail(email);
+  console.log(existedUser);
 
   if (!existedUser) {
     throw new HttpError('Account is not existed', 400);

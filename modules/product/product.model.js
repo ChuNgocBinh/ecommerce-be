@@ -27,7 +27,52 @@ const getProductById = async (id) => {
   }
 };
 
+const getListProduct = async () => {
+  try {
+    const result = await db('product_item')
+      .leftJoin('shop_accounts', 'shop_accounts.id', 'product_item.shop_id')
+      .select(
+        'product_item.id',
+        'product_item.product_name',
+        'product_item.shop_id',
+        'product_item.brand',
+        'product_item.cost',
+        'product_item.discount',
+        'product_item.quantity',
+        'product_item.picture_url',
+        'shop_accounts.shop_name'
+      );
+    return result || null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const getListProductByShopId = async (id) => {
+  try {
+    const result = await db('product_item').select('*').where('shop_id', id);
+    return result || null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const deteleProductById = async (id) => {
+  try {
+    const result = await db('product_item').where('id', id).del();
+    return result || null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 module.exports = {
   createProductItem,
   getProductById,
+  getListProduct,
+  getListProductByShopId,
+  deteleProductById,
 };
