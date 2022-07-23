@@ -68,6 +68,7 @@ const getUserById = async (user_id) => {
         'email',
         'phone_number',
         'address',
+        'profile_picture',
       )
       .where('id', user_id);
     return result ? result[0] : null;

@@ -99,6 +99,7 @@ const login = async (req, res, next) => {
     username: existedUser.user_name,
     phone_number: existedUser.phone_number,
     address: existedUser.address,
+    profile_picture: existedUser.profile_picture,
     isActive: existedUser.isActive,
   };
   const dataToken = {
@@ -115,6 +116,18 @@ const login = async (req, res, next) => {
   });
 };
 
+const getMe = async (req, res, next) => {
+  const { user } = req;
+  const userInfo = await authModel.getUserById(user.id);
+  if (!userInfo) {
+    throw new HttpError('user is not existed', 400);
+  }
+  res.send({
+    status: 'success',
+    data: userInfo,
+  });
+};
+
 const exportUserCsv = async (req, res, next) => {
   res.attachment('user.csv');
   const result = await authModel.getlistUser();
@@ -127,4 +140,5 @@ module.exports = {
   createUser,
   login,
   exportUserCsv,
+  getMe,
 };
