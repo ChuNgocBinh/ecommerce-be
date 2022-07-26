@@ -54,7 +54,9 @@ const loginAdmin = async (req, res, next) => {
 };
 
 const createUser = async (req, res, next) => {
-  const { username, email, password, phoneNumber } = req.body;
+  const {
+    username, email, password, phoneNumber
+  } = req.body;
 
   const salt = bcrypt.genSaltSync(10);
   const hashPassword = bcrypt.hashSync(password, salt);
@@ -127,10 +129,28 @@ const getMe = async (req, res, next) => {
   });
 };
 
-const exportUserCsv = async (req, res, next) => {
-  res.attachment('user.csv');
-  const result = await authModel.getlistUser();
-  res.pipe(fastCsv.format({ headers: true })).pipe(res);
+const getMeAdmin = async (req, res, next) => {
+  const { user } = req;
+  const userInfo = await authModel.getUserAdminById(user.id);
+  if (!userInfo) {
+    throw new HttpError('user is not existed', 400);
+  }
+  res.send({
+    status: 'success',
+    data: userInfo,
+  });
+};
+
+const getListUser = async (req, res, next) => {
+  const { user } = req;
+  const listUser = await authModel.getListUser();
+  if (!listUser) {
+    throw new HttpError('server error', 400);
+  }
+  res.send({
+    status: 'success',
+    data: listUser,
+  });
 };
 
 module.exports = {
@@ -138,6 +158,7 @@ module.exports = {
   loginAdmin,
   createUser,
   login,
-  exportUserCsv,
   getMe,
+  getMeAdmin,
+  getListUser
 };

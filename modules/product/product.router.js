@@ -13,5 +13,6 @@ router.get(
   productController.getListProductByShopId
 );
 router.delete('/delete/:product_id', isAuth, productController.deleteProduct);
+router.get('/list-product-waiting', isAuth, productController.getListProductWaiting);
 
 module.exports = router;
