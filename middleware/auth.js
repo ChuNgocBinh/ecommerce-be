@@ -1,3 +1,4 @@
+const HttpError = require('../common/httpError');
 const { verifyToken } = require('../common/tokenProvider');
 const { getUserById } = require('../modules/auth/auth.model');
 
@@ -13,7 +14,7 @@ const isAuth = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(error);
-    next();
+    throw new HttpError('Unauthorization', 401);
   }
 };
 

@@ -77,10 +77,22 @@ const deleteProduct = async (req, res, next) => {
   });
 };
 
+const getListProductWaiting = async (req, res, next) => {
+  const result = await productModel.getListProductsWaiting();
+  if (!result) {
+    throw new HttpError('server error', 400);
+  }
+  res.send({
+    status: 'success',
+    data: result,
+  });
+};
+
 module.exports = {
   createProduct,
   getProductById,
   getListProduct,
   getListProductByShopId,
   deleteProduct,
+  getListProductWaiting
 };

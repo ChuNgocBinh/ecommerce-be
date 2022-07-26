@@ -77,14 +77,36 @@ const getUserById = async (user_id) => {
     return null;
   }
 };
-
-const getlistUser = async () => {
+const getUserAdminById = async (user_id) => {
   try {
-    const result = await db('user')
-      .stream();
+    const result = await db('users_admin')
+      .select(
+        'id',
+        'user_name',
+        'email',
+      )
+      .where('id', user_id);
+    return result ? result[0] : null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
+const getListUser = async () => {
+  try {
+    const result = await db('users')
+      .select(
+        'id',
+        'user_name',
+        'email',
+        'phone_number',
+        'isActive'
+      );
     return result;
   } catch (error) {
     console.log(error);
+    return false;
   }
 };
 
@@ -94,5 +116,6 @@ module.exports = {
   createUser,
   getUserByEmail,
   getUserById,
-  getlistUser,
+  getListUser,
+  getUserAdminById,
 };

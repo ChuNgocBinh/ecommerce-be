@@ -69,10 +69,32 @@ const deteleProductById = async (id) => {
   }
 };
 
+const getListProductsWaiting = async (id) => {
+  try {
+    const result = await db('product_item')
+      .leftJoin('shop_accounts', 'shop_accounts.id', 'product_item.shop_id')
+      .select(
+        'product_item.id',
+        'product_item.product_name',
+        'product_item.brand',
+        'product_item.cost',
+        'product_item.discount',
+        'product_item.quantity',
+        'shop_accounts.shop_name',
+      )
+      .where('isAccept', 0);
+    return result || null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 module.exports = {
   createProductItem,
   getProductById,
   getListProduct,
   getListProductByShopId,
   deteleProductById,
+  getListProductsWaiting
 };
