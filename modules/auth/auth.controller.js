@@ -153,6 +153,17 @@ const getListUser = async (req, res, next) => {
   });
 };
 
+const updateUser = async (req, res, next) => {
+  const { user } = req;
+  const isUserUpdate = await authModel.updateUserInfo(user.id);
+  if (!isUserUpdate) {
+    throw new HttpError('server error', 400);
+  }
+  res.send({
+    status: 'success'
+  });
+};
+
 module.exports = {
   createUserAdmin,
   loginAdmin,
@@ -160,5 +171,6 @@ module.exports = {
   login,
   getMe,
   getMeAdmin,
-  getListUser
+  getListUser,
+  updateUser
 };

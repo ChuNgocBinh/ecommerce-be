@@ -62,15 +62,19 @@ const getUserByEmail = async (email) => {
 const getUserById = async (user_id) => {
   try {
     const result = await db('users')
+      .leftJoin('shop_accounts', 'shop_accounts.user_id', 'users.id')
       .select(
-        'id',
-        'user_name',
-        'email',
-        'phone_number',
-        'address',
-        'profile_picture',
+        'users.id',
+        'users.user_name',
+        'users.email',
+        'users.phone_number',
+        'users.address',
+        'users.profile_picture',
+        'shop_accounts.id as shop_id',
+        'shop_accounts.shop_name',
+        'shop_accounts.shop_account_status'
       )
-      .where('id', user_id);
+      .where('users.id', user_id);
     return result ? result[0] : null;
   } catch (error) {
     console.log(error);
@@ -110,6 +114,23 @@ const getListUser = async () => {
   }
 };
 
+const updateUserInfo = async (id, data) => {
+  try {
+    const result = await db.transaction(async (trx) => {
+      const res = await trx('users')
+        .where('id', id)
+        .update(data);
+      if (!res) {
+        return false;
+      }
+      return true;
+    });
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   createUserAdmin,
   getUserAdminByEmail,
@@ -118,4 +139,5 @@ module.exports = {
   getUserById,
   getListUser,
   getUserAdminById,
+  updateUserInfo
 };
