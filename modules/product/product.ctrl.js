@@ -53,6 +53,32 @@ const getListProduct = async (req, res, next) => {
   });
 };
 
+const getListProductAcceptByShopId = async (req, res, next) => {
+  const { user } = req;
+  const { shop_user } = req;
+  const result = await productModel.getListProductAcceptByShopId(shop_user.id);
+  if (!result) {
+    throw new HttpError('server error', 400);
+  }
+  res.send({
+    status: 'success',
+    data: result,
+  });
+};
+
+const getListProductWaitingByShopId = async (req, res, next) => {
+  const { user } = req;
+  const { shop_user } = req;
+  const result = await productModel.getListProductWaitingByShopId(shop_user.id);
+  if (!result) {
+    throw new HttpError('server error', 400);
+  }
+  res.send({
+    status: 'success',
+    data: result,
+  });
+};
+
 const getListProductByShopId = async (req, res, next) => {
   const { shop_user } = req;
   const result = await productModel.getListProductByShopId(shop_user.id);
@@ -88,11 +114,44 @@ const getListProductWaiting = async (req, res, next) => {
   });
 };
 
+const getListProductsBySearch = async (req, res, next) => {
+  try {
+    const { search } = req.query;
+    console.log(search);
+    const result = await productModel.getListProductsBySearch(search);
+    res.send({
+      status: 'success',
+      data: result
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const updateProduct = async (req, res, next) => {
+  const { user } = req;
+  const bodyData = req.body;
+  const { product_id } = req.params;
+
+  const newProduct = await productModel.updateProductItem(bodyData, product_id);
+  if (!newProduct) {
+    throw new HttpError('Create product fail', 400);
+  }
+
+  res.send({
+    status: 'success',
+  });
+};
+
 module.exports = {
   createProduct,
   getProductById,
   getListProduct,
   getListProductByShopId,
   deleteProduct,
-  getListProductWaiting
+  getListProductWaiting,
+  getListProductsBySearch,
+  getListProductAcceptByShopId,
+  updateProduct,
+  getListProductWaitingByShopId
 };
