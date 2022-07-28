@@ -155,7 +155,8 @@ const getListUser = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   const { user } = req;
-  const isUserUpdate = await authModel.updateUserInfo(user.id);
+  const data = req.body;
+  const isUserUpdate = await authModel.updateUserInfo(user.id, data);
   if (!isUserUpdate) {
     throw new HttpError('server error', 400);
   }
