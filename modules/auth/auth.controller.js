@@ -153,6 +153,45 @@ const getListUser = async (req, res, next) => {
   });
 };
 
+const getUserById = async (req, res, next) => {
+  const { id } = req.params;
+  const listUser = await authModel.getUserById(id);
+  if (!listUser) {
+    throw new HttpError('server error', 400);
+  }
+  res.send({
+    status: 'success',
+    data: listUser,
+  });
+};
+
+const updateLockUser = async (req, res, next) => {
+  const { user } = req;
+  const bodyData = req.body;
+  const { id } = req.params;
+
+  const newProduct = await authModel.toggleLockUser(bodyData, id);
+  if (!newProduct) {
+    throw new HttpError('Create product fail', 400);
+  }
+
+  res.send({
+    status: 'success',
+  });
+};
+
+const deleteUserById = async (req, res) => {
+  const { id } = req.params;
+  const deleted = await authModel.deleteUser(id);
+  if (!deleted) {
+    throw new HttpError('Error');
+  }
+  res.send({
+    status: 'success',
+    data: deleted,
+  });
+};
+
 module.exports = {
   createUserAdmin,
   loginAdmin,
@@ -160,5 +199,8 @@ module.exports = {
   login,
   getMe,
   getMeAdmin,
-  getListUser
+  getListUser,
+  getUserById,
+  updateLockUser,
+  deleteUserById
 };
