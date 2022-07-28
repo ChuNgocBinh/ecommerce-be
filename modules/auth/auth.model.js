@@ -81,6 +81,36 @@ const getUserById = async (user_id) => {
     return null;
   }
 };
+
+const toggleLockUser = async (data, id) => {
+  try {
+    const result = await db.transaction(async (trx) => {
+      const res = await trx('users')
+        .where('id', id)
+        .update(data);
+      if (!res) {
+        return false;
+      }
+
+      return true;
+    });
+    return result;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const deleteUser = async (id) => {
+  try {
+    const result = await db('users').where('id', id).delete();
+    return result || null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 const getUserAdminById = async (user_id) => {
   try {
     const result = await db('users_admin')
@@ -140,5 +170,7 @@ module.exports = {
   getUserById,
   getListUser,
   getUserAdminById,
+  toggleLockUser,
+  deleteUser,
   updateUserInfo
 };
