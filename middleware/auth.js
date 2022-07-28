@@ -7,7 +7,7 @@ const isAuth = async (req, res, next) => {
     const bearerToken = req.headers.authorization;
     const token = bearerToken.split(' ')[1];
     const userInfo = verifyToken(token);
-
+    console.log(userInfo);
     const user = await getUserById(userInfo.id);
     req.user = user;
 
