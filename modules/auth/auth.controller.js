@@ -192,6 +192,17 @@ const deleteUserById = async (req, res) => {
   });
 };
 
+const updateUser = async (req, res, next) => {
+  const { user } = req;
+  const data = req.body;
+  const isUserUpdate = await authModel.updateUserInfo(user.id, data);
+  if (!isUserUpdate) {
+    throw new HttpError('server error', 400);
+  }
+  res.send({
+    status: 'success'
+  });
+};
 module.exports = {
   createUserAdmin,
   loginAdmin,
@@ -202,5 +213,6 @@ module.exports = {
   getListUser,
   getUserById,
   updateLockUser,
-  deleteUserById
+  deleteUserById,
+  updateUser
 };
