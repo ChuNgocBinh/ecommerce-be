@@ -5,7 +5,7 @@ const productController = require('./product.ctrl');
 
 router.post('/create', isAuth, productController.createProduct);
 router.get('/item/:product_id', isAuth, productController.getProductById);
-router.get('/list-product', isAuth, productController.getListProduct);
+router.get('/list-product', productController.getListProduct);
 router.get(
   '/list-my-products',
   isAuth,
