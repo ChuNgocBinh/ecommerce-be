@@ -125,6 +125,7 @@ const updateUserInfo = async (id, data) => {
       }
       return true;
     });
+    return result;
   } catch (error) {
     console.log(error);
     return false;
