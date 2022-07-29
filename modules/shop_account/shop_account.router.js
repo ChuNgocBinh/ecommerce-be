@@ -6,5 +6,6 @@ const shopAccountCtrl = require('./shop_account.ctrl');
 router.post('/create', isAuth, upload.single('file'), shopAccountCtrl.createShop);
 router.post('/update', isAuth, shopAccountCtrl.updateShop);
 router.get('/my-shop', isAuth, shopAccountCtrl.getShopById);
+router.get('/list-shop-account', isAuth, shopAccountCtrl.getListShopAccount);
 
 module.exports = router;

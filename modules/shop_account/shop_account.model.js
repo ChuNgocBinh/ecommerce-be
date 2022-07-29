@@ -56,8 +56,19 @@ const getShopAccountByUserId = async (user_id) => {
   }
 };
 
+const getListShop = async (user_id) => {
+  try {
+    const result = await db('shop_accounts');
+    return result;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 module.exports = {
   createShopAccount,
   updateShopAccount,
   getShopAccountByUserId,
+  getListShop
 };

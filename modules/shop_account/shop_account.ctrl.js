@@ -1,7 +1,9 @@
 const HttpError = require('../../common/httpError');
 const { uploadFile } = require('../../common/upload');
 const db = require('../../db/db_helper');
-const { createShopAccount, updateShopAccount, getShopAccountByUserId } = require('./shop_account.model');
+const {
+  createShopAccount, updateShopAccount, getShopAccountByUserId, getListShop
+} = require('./shop_account.model');
 
 const createShop = async (req, res, next) => {
   const { user, file } = req;
@@ -70,8 +72,25 @@ const getShopById = async (req, res, next) => {
   }
 };
 
+const getListShopAccount = async (req, res, next) => {
+  try {
+    const result = await getListShop();
+    if (!result) {
+      throw new HttpError('server error', 400);
+    }
+    res.send({
+      status: 'success',
+      data: result,
+    });
+  } catch (error) {
+    console.log(error);
+    throw new HttpError('server error', 400);
+  }
+};
+
 module.exports = {
   createShop,
   updateShop,
   getShopById,
+  getListShopAccount
 };
