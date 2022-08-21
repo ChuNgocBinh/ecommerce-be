@@ -1,3 +1,4 @@
+const { default: axios } = require('axios');
 const bcrypt = require('bcrypt');
 const fastCsv = require('fast-csv');
 const HttpError = require('../../common/httpError');
@@ -203,6 +204,23 @@ const updateUser = async (req, res, next) => {
     status: 'success'
   });
 };
+
+const recapcha = async (req, res, next) => {
+  const secret_key = '6LdCoVohAAAAAIA7jix9yoVyC42IYZW335u7E4pn';
+  const token = '03ANYolqtyUaZLBvpwVV5x2mE2RaGbjk6Bs5FIIETOTEXnOuZ-l1Go4JC-1a5AfYX5zTyuKC2PbKYrrkYyO3PDkH0ZLLoxqWKyvCccRplshUUvPiPWJTAXV_C9OGdB4kK9g7G8_e1Hn-iJ80WIG4JD7_kPaEQkC59vCAknkjoc1s5SDgWmK1iOfJqOw1hObYQJt_iYs6wnVpcX-Ieohf4Ggf104EzbznnOOCjjK0pJik-aC06_TuPIo5QPtoh4w28vh8dZATzkNPr2R7cVpizEg-gonxExtai5bGkQvyujAjFCmW6C0XGTVbXfbHIej9uVbHTTXmysoCKedRwZiv4FHZVBu6_9vHb2hRsN9EFsB9tFxppxhTnTirJPAsAzQs_hb1ISdUn_G6AgM2Y0tSHNrNTQn2g6ZAtf86TsJ2g3RC0UIPnEiLqHzwriXsQn0DGQAHAwhTynIMVPi2-pVgiLoTdov3_81V7f0tIULlp4f10sBD5Ls_W58zgiyIDs3UzHfzYL6TfkmsUE';
+  const respon = await axios({
+    url: 'https://www.google.com/recaptcha/api/siteverify',
+    method: 'POST',
+    params: {
+      secret: secret_key,
+      response: token
+    }
+  });
+  console.log(respon.data);
+  res.send({
+    status: 'success'
+  });
+};
 module.exports = {
   createUserAdmin,
   loginAdmin,
@@ -214,5 +232,6 @@ module.exports = {
   getUserById,
   updateLockUser,
   deleteUserById,
-  updateUser
+  updateUser,
+  recapcha
 };
