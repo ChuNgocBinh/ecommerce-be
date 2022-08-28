@@ -4,6 +4,21 @@ const authController = require('./auth.controller');
 
 const router = express.Router();
 
+/**
+ * @swagger
+ *  /api/me:
+ *  get:
+ *    summary: Returns a me info.
+ *    description: Optional extended description in CommonMark or HTML.
+ *    responses:
+ *      200:
+ *        description: A JSON array of user names
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: array
+ */
+
 router.post('/register/admin', authController.createUserAdmin);
 
 router.post('/login/admin', authController.loginAdmin);

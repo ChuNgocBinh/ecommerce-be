@@ -28,7 +28,7 @@ const options = {
   servers: {
     url: 'http://localhost:8080'
   },
-  apis: ['./modules/auth/auth.router.js'],
+  apis: ['./modules/auth/*.js'],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
