@@ -4,6 +4,7 @@ const cors = require('cors');
 require('express-async-errors');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
+const moment = require('moment');
 
 const authRouter = require('./modules/auth/auth.router');
 const shopRouter = require('./modules/shop_account/shop_account.router');
@@ -16,6 +17,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+const myLogger = (req, res, next) => {
+  console.log(`using API ${req.url} in ${moment().format('DD-MM-YYYY, h:mm:ss a')}`);
+  next();
+};
+app.use(myLogger);
+
 const options = {
   failOnErrors: true, // Whether or not to throw when parsing errors. Defaults to false.
   definition: {
@@ -25,9 +32,11 @@ const options = {
       version: '1.0.0',
     },
   },
-  servers: {
-    url: 'http://localhost:8080'
-  },
+  servers: [
+    {
+      url: 'http://localhost:8080'
+    },
+  ],
   apis: ['./modules/auth/*.js'],
 };
 
