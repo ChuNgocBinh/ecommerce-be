@@ -20,6 +20,8 @@ const router = express.Router();
  *  get:
  *    summary: Returns a me info.
  *    description: Optional extended description in CommonMark or HTML.
+ *    tags:
+ *      - auth
  *    security:
  *      - bearerAuth: []
  *    responses:
@@ -37,6 +39,8 @@ const router = express.Router();
  *  post:
  *    summary: Returns status login.
  *    description: Optional extended description in CommonMark or HTML.
+ *    tags:
+ *      - auth
  *    requestBody:
  *      required: true
  *      content:
@@ -78,6 +82,8 @@ router.get('/list-user', isAuth, authController.getListUser);
  *  get:
  *    summary: Returns a me info.
  *    description: Optional extended description in CommonMark or HTML.
+ *    tags:
+ *      - auth
  *    security:
  *      - bearerAuth: []
  *    parameters:
