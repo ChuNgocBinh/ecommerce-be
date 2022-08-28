@@ -25,6 +25,9 @@ const options = {
       version: '1.0.0',
     },
   },
+  servers: {
+    url: 'http://localhost:8080'
+  },
   apis: ['./modules/auth/auth.router.js'],
 };
 
