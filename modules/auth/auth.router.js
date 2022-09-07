@@ -105,7 +105,6 @@ router.get('/list-user', isAuth, authController.getListUser);
 router.get('/list-user/:id', isAuth, authController.getUserById);
 router.post('/update-user/:id', isAuth, authController.updateLockUser);
 router.post('/delete-user/:id', isAuth, authController.deleteUserById);
-router.get('/recapcha', authController.recapcha);
 router.post('/login-gg-sso', authController.loginGoogleSSO);
 
 module.exports = router;

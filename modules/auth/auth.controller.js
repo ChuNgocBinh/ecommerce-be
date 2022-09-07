@@ -6,6 +6,7 @@ const HttpError = require('../../common/httpError');
 const tokenProvider = require('../../common/tokenProvider');
 const authModel = require('./auth.model');
 const serviceAccount = require('../../serviceAccountKey.json');
+const { verifyRecapcha } = require('../../util/until');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -211,29 +212,17 @@ const updateUser = async (req, res, next) => {
   });
 };
 
-const recapcha = async (req, res, next) => {
-  const secret_key = '6LdCoVohAAAAAIA7jix9yoVyC42IYZW335u7E4pn';
-  const token = '03ANYolqtyUaZLBvpwVV5x2mE2RaGbjk6Bs5FIIETOTEXnOuZ-l1Go4JC-1a5AfYX5zTyuKC2PbKYrrkYyO3PDkH0ZLLoxqWKyvCccRplshUUvPiPWJTAXV_C9OGdB4kK9g7G8_e1Hn-iJ80WIG4JD7_kPaEQkC59vCAknkjoc1s5SDgWmK1iOfJqOw1hObYQJt_iYs6wnVpcX-Ieohf4Ggf104EzbznnOOCjjK0pJik-aC06_TuPIo5QPtoh4w28vh8dZATzkNPr2R7cVpizEg-gonxExtai5bGkQvyujAjFCmW6C0XGTVbXfbHIej9uVbHTTXmysoCKedRwZiv4FHZVBu6_9vHb2hRsN9EFsB9tFxppxhTnTirJPAsAzQs_hb1ISdUn_G6AgM2Y0tSHNrNTQn2g6ZAtf86TsJ2g3RC0UIPnEiLqHzwriXsQn0DGQAHAwhTynIMVPi2-pVgiLoTdov3_81V7f0tIULlp4f10sBD5Ls_W58zgiyIDs3UzHfzYL6TfkmsUE';
-  const respon = await axios({
-    url: 'https://www.google.com/recaptcha/api/siteverify',
-    method: 'POST',
-    params: {
-      secret: secret_key,
-      response: token
-    }
-  });
-  console.log(respon.data);
-  res.send({
-    status: 'success'
-  });
-};
-
 const loginGoogleSSO = async (req, res, next) => {
   const bodyData = req.body;
 
   console.log(bodyData);
 
-  const result = await admin.auth().verifyIdToken(bodyData.accessToken);
+  const isVerify = await verifyRecapcha(bodyData.recapchaToken);
+  if (!isVerify.data.success) {
+    throw new HttpError('recapcha is not verify', 400);
+  }
+
+  const result = await admin.auth().verifyIdToken(bodyData.idToken);
   console.log(result);
   res.send({
     status: 'success'
@@ -252,6 +241,5 @@ module.exports = {
   updateLockUser,
   deleteUserById,
   updateUser,
-  recapcha,
   loginGoogleSSO
 };
