@@ -1,9 +1,15 @@
 const { default: axios } = require('axios');
 const bcrypt = require('bcrypt');
 const fastCsv = require('fast-csv');
+const admin = require('firebase-admin');
 const HttpError = require('../../common/httpError');
 const tokenProvider = require('../../common/tokenProvider');
 const authModel = require('./auth.model');
+const serviceAccount = require('../../serviceAccountKey.json');
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 const createUserAdmin = async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -221,6 +227,19 @@ const recapcha = async (req, res, next) => {
     status: 'success'
   });
 };
+
+const loginGoogleSSO = async (req, res, next) => {
+  const bodyData = req.body;
+
+  console.log(bodyData);
+
+  const result = await admin.auth().verifyIdToken(bodyData.accessToken);
+  console.log(result);
+  res.send({
+    status: 'success'
+  });
+};
+
 module.exports = {
   createUserAdmin,
   loginAdmin,
@@ -233,5 +252,6 @@ module.exports = {
   updateLockUser,
   deleteUserById,
   updateUser,
-  recapcha
+  recapcha,
+  loginGoogleSSO
 };
