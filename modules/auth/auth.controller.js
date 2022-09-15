@@ -2,15 +2,19 @@ const { default: axios } = require('axios');
 const bcrypt = require('bcrypt');
 const fastCsv = require('fast-csv');
 const admin = require('firebase-admin');
+const { OAuth2Client } = require('google-auth-library');
 const HttpError = require('../../common/httpError');
 const tokenProvider = require('../../common/tokenProvider');
 const authModel = require('./auth.model');
 const serviceAccount = require('../../serviceAccountKey.json');
 const { verifyRecapcha } = require('../../util/until');
+const { defaultPassword } = require('../../util/common');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
 });
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const createUserAdmin = async (req, res, next) => {
   const { username, email, password } = req.body;
@@ -215,17 +219,77 @@ const updateUser = async (req, res, next) => {
 const loginGoogleSSO = async (req, res, next) => {
   const bodyData = req.body;
 
-  console.log(bodyData);
-
   const isVerify = await verifyRecapcha(bodyData.recapchaToken);
   if (!isVerify.data.success) {
     throw new HttpError('recapcha is not verify', 400);
   }
 
-  const result = await admin.auth().verifyIdToken(bodyData.idToken);
-  console.log(result);
+  let result;
+  if (bodyData.rule === 'firebase') {
+    result = await admin.auth().verifyIdToken(bodyData.idToken);
+  } else {
+    const ticket = await client.verifyIdToken({
+      idToken: bodyData.idToken,
+      audience: process.env.GOOGLE_CLIENT_ID
+    });
+    const payload = ticket.getPayload();
+    console.log(payload);
+  }
+  const dataUpdate = {
+    user_name: result.name,
+    email: result.email,
+    profile_picture: result.picture,
+    gg_sso: 1
+  };
+  let dataToken;
+  let dataResponse;
+  const existedUser = await authModel.getUserByEmail(result.email);
+  if (existedUser) {
+    dataToken = {
+      id: existedUser.id,
+      email: existedUser.email,
+      username: existedUser.user_name,
+    };
+    dataResponse = {
+      id: existedUser.id,
+      email: result.email,
+      username: result.name,
+      phone_number: existedUser.phone_number,
+      address: existedUser.address,
+      profile_picture: result.picture,
+      isActive: existedUser.isActive,
+    };
+    const isUpdateUser = await authModel.updateUserInfo(existedUser.id, dataUpdate);
+    if (!isUpdateUser) {
+      throw new HttpError('server errror', 400);
+    }
+  } else {
+    const salt = bcrypt.genSaltSync(10);
+    const hashPassword = bcrypt.hashSync(defaultPassword, salt);
+    dataUpdate.password = hashPassword;
+    const isNewUser = await authModel.createGoogleSSOUser(dataUpdate);
+    dataToken = {
+      id: isNewUser[0],
+      email: result.email,
+      username: result.user_name,
+    };
+
+    dataResponse = {
+      id: isNewUser[0],
+      email: result.email,
+      username: result.name,
+      phone_number: null,
+      address: null,
+      profile_picture: result.picture,
+      isActive: 1,
+    };
+  }
+
+  const token = tokenProvider.createToken(dataToken);
   res.send({
-    status: 'success'
+    status: 'success',
+    token,
+    data: dataResponse
   });
 };
 

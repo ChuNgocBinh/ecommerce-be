@@ -162,6 +162,23 @@ const updateUserInfo = async (id, data) => {
   }
 };
 
+const createGoogleSSOUser = async (data) => {
+  try {
+    const result = await db.transaction(async (trx) => {
+      const res = await trx('users').insert(data);
+      console.log(res);
+      if (res.length) {
+        return res;
+      }
+      return false;
+    });
+    return result;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   createUserAdmin,
   getUserAdminByEmail,
@@ -172,5 +189,6 @@ module.exports = {
   getUserAdminById,
   toggleLockUser,
   deleteUser,
-  updateUserInfo
+  updateUserInfo,
+  createGoogleSSOUser
 };

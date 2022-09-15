@@ -30,6 +30,7 @@
     "express-async-errors": "^3.1.1",
     "fast-csv": "^4.3.6",
     "firebase-admin": "^11.0.1",
+    "google-auth-library": "^8.5.1",
     "heroku": "^7.62.0",
     "jsonwebtoken": "^8.5.1",
     "knex": "^2.1.0",
