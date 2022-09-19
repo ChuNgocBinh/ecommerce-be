@@ -5,10 +5,11 @@ const getListConversation = async (req, res, next) => {
   const { user } = req;
   const skip = (page - 1) * page_size;
   const limit = page_size;
-  const result = await getAll(user, skip, limit);
-  console.log(result);
+  const result = await getAll(user.id, skip, limit);
+
   res.send({
     status: 'success',
+    data: result
   });
 };
 

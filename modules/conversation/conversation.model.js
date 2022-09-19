@@ -2,11 +2,17 @@ const db = require('../../db/db_helper');
 
 const getAll = async (id, skip, limit) => {
   try {
-    const res = await db('conversation')
+    const res = await db('participants')
+      .leftJoin('conversation', 'conversation.id', 'participants.conversation_id')
+      .select(
+        'participants.conversation_id',
+        'participants.user_id',
+        'conversation.title',
+        'conversation.created_by',
+      )
       .offset(skip)
       .limit(limit)
-      .where('member_1', id)
-      .orwhere('member_2', id);
+      .where('user_id', id);
     if (res.length) {
       return res;
     }

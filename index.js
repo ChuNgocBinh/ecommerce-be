@@ -13,6 +13,7 @@ const commentRouter = require('./modules/comment/comment.router');
 const handleError = require('./common/handleError');
 const cartRouter = require('./modules/cart/cart.router');
 const conversationRouter = require('./modules/conversation/conversation.router');
+const messagenRouter = require('./modules/messages/message.router');
 
 const app = express();
 app.use(cors());
@@ -49,6 +50,7 @@ app.use('/api/product', productRouter);
 app.use('/api/comment', commentRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/conversations', conversationRouter);
+app.use('/api/message', messagenRouter);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(handleError);
