@@ -27,6 +27,22 @@ const getAll = async (id, skip, limit) => {
   }
 };
 
+const createNewMessage = async (data) => {
+  try {
+    const res = await db('messages')
+      .insert(data);
+
+    if (res.length) {
+      return res;
+    }
+    return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   getAll,
+  createNewMessage
 };
