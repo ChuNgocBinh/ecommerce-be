@@ -55,14 +55,6 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.use(handleError);
 
-// test cicd heroku
-// test cicd heroku
-// test cicd heroku
-// test cicd heroku
-// helo heroku
-// helo heroku
-// helo heroku
-
 app.listen(process.env.PORT, () => {
   console.log(`server connected in port ${process.env.PORT}`);
 });
