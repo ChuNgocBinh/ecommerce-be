@@ -23,7 +23,7 @@ const myLogger = (req, res, next) => {
   console.log(`using API ${req.url} in ${moment().format('DD-MM-YYYY, h:mm:ss a')}`);
   next();
 };
-app.use(myLogger);
+// app.use(myLogger);
 
 const options = {
   failOnErrors: true, // Whether or not to throw when parsing errors. Defaults to false.
