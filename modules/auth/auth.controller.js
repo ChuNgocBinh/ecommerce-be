@@ -95,7 +95,6 @@ const login = async (req, res, next) => {
   const { email, password } = req.body;
 
   const existedUser = await authModel.getUserByEmail(email);
-  console.log(existedUser);
 
   if (!existedUser) {
     throw new HttpError('Account is not existed', 400);
@@ -105,7 +104,6 @@ const login = async (req, res, next) => {
   if (!verifyPasswrd) {
     throw new HttpError('wrong password', 400);
   }
-  console.log(existedUser);
   const data = {
     id: existedUser.id,
     email: existedUser.email,
