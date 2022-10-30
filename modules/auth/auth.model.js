@@ -179,6 +179,40 @@ const createGoogleSSOUser = async (data) => {
   }
 };
 
+const getUserByRefreshToken = async (token) => {
+  try {
+    const result = await db('users')
+      .select(
+        'refresh_token'
+      )
+      .where({
+        refresh_token: token
+      });
+    return result;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const getUserInfo = async (id) => {
+  try {
+    const result = await db('users')
+      .select(
+        'refresh_token',
+        'id',
+        'user_name'
+      )
+      .where({
+        id
+      });
+    return result ? result[0] : null;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+};
+
 module.exports = {
   createUserAdmin,
   getUserAdminByEmail,
@@ -190,5 +224,7 @@ module.exports = {
   toggleLockUser,
   deleteUser,
   updateUserInfo,
-  createGoogleSSOUser
+  createGoogleSSOUser,
+  getUserByRefreshToken,
+  getUserInfo
 };

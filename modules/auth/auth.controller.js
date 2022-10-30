@@ -119,11 +119,19 @@ const login = async (req, res, next) => {
     username: existedUser.user_name,
   };
 
-  const token = tokenProvider.createToken(dataToken);
-
+  const accessToken = tokenProvider.createToken(dataToken);
+  const refreshToken = tokenProvider.createRefreshToken(dataToken);
+  const isUpdate = await authModel.updateUserInfo(existedUser.id, {
+    access_token: accessToken,
+    refresh_token: refreshToken
+  });
+  if (!isUpdate) {
+    throw new HttpError('server error', 500);
+  }
   res.send({
     data,
-    token,
+    token: accessToken,
+    refreshToken
   });
 };
 
@@ -284,10 +292,60 @@ const loginGoogleSSO = async (req, res, next) => {
   }
 
   const token = tokenProvider.createToken(dataToken);
+  const refreshToken = tokenProvider.createRefreshToken(dataToken);
+  const isUpdate = await authModel.updateUserInfo(dataToken.id, {
+    access_token: token,
+    refresh_token: refreshToken
+  });
+
+  if (!isUpdate) {
+    throw new HttpError('server error', 500);
+  }
+
   res.send({
     status: 'success',
     token,
+    refresh_token: refreshToken,
     data: dataResponse
+  });
+};
+
+const refreshToken = async (req, res, next) => {
+  const bearerToken = req.headers.authorization;
+  const access_token = bearerToken.split(' ')[1];
+  const { refresh_token } = req.body;
+
+  const tokenInfo = tokenProvider.verifyTokenExpire(access_token);
+  const userInfo = await authModel.getUserInfo(tokenInfo.id);
+  if (!userInfo) {
+    throw new HttpError('Khong tim thay user', 400);
+  }
+
+  if (refresh_token !== userInfo.refresh_token) {
+    throw new HttpError('refresh token khong chinh xac', 405);
+  }
+  const refreshTokenDecode = tokenProvider.verifyRefreshToken(refresh_token);
+  if (!refreshTokenDecode) {
+    throw new HttpError('refresh token expire', 405);
+  }
+  const userToken = {
+    id: tokenInfo.id,
+    email: tokenInfo.email,
+    username: tokenInfo.username,
+  };
+  const newAccessToken = tokenProvider.createToken(userToken);
+  const newRefreshToken = tokenProvider.createRefreshToken(userToken);
+
+  const isUpdate = await authModel.updateUserInfo(userInfo.id, {
+    access_token: newAccessToken,
+    refresh_token: newRefreshToken
+  });
+  if (!isUpdate) {
+    throw new HttpError('server error', 500);
+  }
+  res.send({
+    access_token: newAccessToken,
+    refresh_token: newRefreshToken
   });
 };
 
@@ -303,5 +361,6 @@ module.exports = {
   updateLockUser,
   deleteUserById,
   updateUser,
-  loginGoogleSSO
+  loginGoogleSSO,
+  refreshToken
 };
