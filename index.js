@@ -19,59 +19,62 @@ const conversationRouter = require('./modules/conversation/conversation.router')
 const messagenRouter = require('./modules/messages/message.router');
 const socketServer = require('./socket/socket');
 
-const app = express();
-const httpServer = createServer(app);
-
-const io = new Server(httpServer, {
-  cors: {
-    origin: '*'
-  }
-});
-
 const eventIo = new EventEmitter();
+async function main() {
+  const app = express();
+  const httpServer = createServer(app);
 
-io.on('connection', (socket) => {
-  socketServer(socket, eventIo);
-  console.log(`connected is ${socket.id}`);
-});
+  const io = new Server(httpServer, {
+    cors: {
+      origin: '*'
+    }
+  });
 
-app.use(cors());
-app.use(express.json());
-app.use((req, res, next) => {
-  req.eventIo = eventIo;
-  next();
-});
+  io.on('connection', (socket) => {
+    socketServer(socket, eventIo);
+    console.log(`connected is ${socket.id}`);
+  });
 
-const options = {
-  failOnErrors: true, // Whether or not to throw when parsing errors. Defaults to false.
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Hello World',
-      version: '1.0.0',
+  app.use(cors());
+  app.use(express.json());
+  app.use((req, res, next) => {
+    req.eventIo = eventIo;
+    next();
+  });
+
+  const options = {
+    failOnErrors: true, // Whether or not to throw when parsing errors. Defaults to false.
+    definition: {
+      openapi: '3.0.0',
+      info: {
+        title: 'Hello World',
+        version: '1.0.0',
+      },
     },
-  },
-  servers: [
-    {
-      url: 'http://localhost:8080'
-    },
-  ],
-  apis: ['./modules/auth/*.js'],
-};
+    servers: [
+      {
+        url: 'http://localhost:8080'
+      },
+    ],
+    apis: ['./modules/auth/*.js'],
+  };
 
-const swaggerSpec = swaggerJsdoc(options);
+  const swaggerSpec = swaggerJsdoc(options);
 
-app.use('/api/auth', authRouter);
-app.use('/api/shop', shopRouter);
-app.use('/api/product', productRouter);
-app.use('/api/comment', commentRouter);
-app.use('/api/cart', cartRouter);
-app.use('/api/conversations', conversationRouter);
-app.use('/api/message', messagenRouter);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use('/api/auth', authRouter);
+  app.use('/api/shop', shopRouter);
+  app.use('/api/product', productRouter);
+  app.use('/api/comment', commentRouter);
+  app.use('/api/cart', cartRouter);
+  app.use('/api/conversations', conversationRouter);
+  app.use('/api/message', messagenRouter);
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-app.use(handleError);
+  app.use(handleError);
 
-httpServer.listen(process.env.PORT, () => {
-  console.log(`server connected in port ${process.env.PORT}`);
-});
+  httpServer.listen(process.env.PORT, () => {
+    console.log(`server connected in port ${process.env.PORT}`);
+  });
+}
+
+main();

@@ -7,8 +7,9 @@ const HttpError = require('../../common/httpError');
 const tokenProvider = require('../../common/tokenProvider');
 const authModel = require('./auth.model');
 const serviceAccount = require('../../serviceAccountKey.json');
-const { verifyRecapcha } = require('../../util/until');
+const { verifyRecapcha, joinRoomConversation } = require('../../util/until');
 const { defaultPassword } = require('../../util/common');
+const { getConversationByUserId } = require('../conversation/conversation.model');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -93,6 +94,7 @@ const createUser = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   const { email, password } = req.body;
+  const { eventIo } = req;
 
   const existedUser = await authModel.getUserByEmail(email);
 
@@ -128,6 +130,7 @@ const login = async (req, res, next) => {
   if (!isUpdate) {
     throw new HttpError('server error', 500);
   }
+  const listCvs = await joinRoomConversation(existedUser.id, eventIo);
   res.send({
     data,
     token: accessToken,
@@ -136,11 +139,12 @@ const login = async (req, res, next) => {
 };
 
 const getMe = async (req, res, next) => {
-  const { user } = req;
+  const { user, eventIo } = req;
   const userInfo = await authModel.getUserById(user.id);
   if (!userInfo) {
     throw new HttpError('user is not existed', 400);
   }
+  const listCvs = await joinRoomConversation(user.id, eventIo);
   res.send({
     status: 'success',
     data: userInfo,
@@ -224,6 +228,7 @@ const updateUser = async (req, res, next) => {
 
 const loginGoogleSSO = async (req, res, next) => {
   const bodyData = req.body;
+  const { eventIo } = req;
 
   const isVerify = await verifyRecapcha(bodyData.recapchaToken);
   if (!isVerify.data.success) {
@@ -301,6 +306,8 @@ const loginGoogleSSO = async (req, res, next) => {
   if (!isUpdate) {
     throw new HttpError('server error', 500);
   }
+
+  const listCvs = await joinRoomConversation(dataToken.id, eventIo);
 
   res.send({
     status: 'success',

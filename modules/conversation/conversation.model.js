@@ -13,7 +13,24 @@ const getAll = async (id, skip, limit) => {
       .offset(skip)
       .limit(limit)
       .where('user_id', id);
-    if (res.length) {
+    if (res) {
+      return res;
+    }
+    return false;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
+const getConversationByUserId = async (id) => {
+  try {
+    const res = await db('participants')
+      .select(
+        'conversation_id',
+      )
+      .where('user_id', id);
+    if (res) {
       return res;
     }
     return false;
@@ -25,4 +42,5 @@ const getAll = async (id, skip, limit) => {
 
 module.exports = {
   getAll,
+  getConversationByUserId
 };

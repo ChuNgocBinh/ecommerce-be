@@ -17,14 +17,14 @@ const getMessagesByconversationId = async (req, res, next) => {
 const createMessage = async (req, res, next) => {
   const { cvs_id } = req.params;
   const { content } = req.body;
-  const { user } = req;
+  const { user, eventIo } = req;
   const data = {
     conversation_id: cvs_id,
     sender_id: user.id,
     content
   };
   const result = await createNewMessage(data);
-
+  eventIo.emit('new-message', data);
   res.send({
     status: 'success',
   });

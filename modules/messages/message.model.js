@@ -18,9 +18,8 @@ const getAll = async (id, skip, limit) => {
       .limit(limit)
       .where('messages.conversation_id', id)
       .orderBy('id', 'desc');
-    if (res.length) {
-      return res;
-    }
+    if (res) { return res; }
+
     return false;
   } catch (error) {
     console.log(error);
