@@ -67,35 +67,44 @@ const loginAdmin = async (req, res, next) => {
 };
 
 const createUser = async (req, res, next) => {
-  const {
-    username, email, password, phoneNumber
-  } = req.body;
+  try {
+    const {
+      username, email, password, phoneNumber
+    } = req.body;
 
-  const salt = bcrypt.genSaltSync(10);
-  const hashPassword = bcrypt.hashSync(password, salt);
+    const salt = bcrypt.genSaltSync(10);
+    const hashPassword = bcrypt.hashSync(password, salt);
 
-  // tìm  user trong db
-  const existedUser = await authModel.getUserAdminByEmail(email);
-  if (existedUser) {
-    throw new HttpError(400, 'Email existed');
+    // tìm  user trong db
+    const existedUser = await authModel.getUserAdminByEmail(email);
+    if (existedUser) {
+      throw new HttpError('Email existed', 400);
+    }
+
+    const newUser = await authModel.createUser({
+      user_name: username,
+      email,
+      phone_number: phoneNumber,
+      password: hashPassword,
+    });
+
+    res.status(200).send({
+      status: 'success',
+    });
+  } catch (error) {
+    console.log(error);
+    throw new HttpError('server error', 500);
   }
-
-  const newUser = await authModel.createUser({
-    user_name: username,
-    email,
-    phone_number: phoneNumber,
-    password: hashPassword,
-  });
-
-  res.status(200).send({
-    status: 'success',
-  });
 };
 
 const login = async (req, res, next) => {
-  const { email, password } = req.body;
+  const { email, password, recapchaToken } = req.body;
   const { eventIo } = req;
 
+  const isVerify = await verifyRecapcha(recapchaToken);
+  if (!isVerify.data.success) {
+    throw new HttpError('recapcha is not verify', 400);
+  }
   const existedUser = await authModel.getUserByEmail(email);
 
   if (!existedUser) {
@@ -132,9 +141,12 @@ const login = async (req, res, next) => {
   }
   const listCvs = await joinRoomConversation(existedUser.id, eventIo);
   res.send({
-    data,
-    token: accessToken,
-    refreshToken
+    status: true,
+    data: {
+      data,
+      token: accessToken,
+      refreshToken
+    }
   });
 };
 

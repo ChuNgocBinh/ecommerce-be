@@ -40,7 +40,8 @@
     "mysql2": "^2.3.3",
     "socket.io": "^4.5.3",
     "swagger-jsdoc": "^6.2.5",
-    "swagger-ui-express": "^4.5.0"
+    "swagger-ui-express": "^4.5.0",
+    "twilio": "^3.84.0"
   },
   "devDependencies": {
     "eslint": "^7.32.0 || ^8.2.0",
