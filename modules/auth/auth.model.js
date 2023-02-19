@@ -213,6 +213,18 @@ const getUserInfo = async (id) => {
   }
 };
 
+const checkField = async (obj) => {
+  try {
+    const result = await db('users')
+      .where(obj)
+      .first();
+    return !!result;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+};
+
 module.exports = {
   createUserAdmin,
   getUserAdminByEmail,
@@ -226,5 +238,6 @@ module.exports = {
   updateUserInfo,
   createGoogleSSOUser,
   getUserByRefreshToken,
-  getUserInfo
+  getUserInfo,
+  checkField
 };

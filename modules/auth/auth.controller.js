@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const fastCsv = require('fast-csv');
 const admin = require('firebase-admin');
 const { OAuth2Client } = require('google-auth-library');
+const { uuid } = require('uuidv4');
 const HttpError = require('../../common/httpError');
 const tokenProvider = require('../../common/tokenProvider');
 const authModel = require('./auth.model');
@@ -10,6 +11,7 @@ const serviceAccount = require('../../serviceAccountKey.json');
 const { verifyRecapcha, joinRoomConversation } = require('../../util/until');
 const { defaultPassword } = require('../../util/common');
 const { getConversationByUserId } = require('../conversation/conversation.model');
+const { uploadFile } = require('../../common/upload');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount)
@@ -368,6 +370,52 @@ const refreshToken = async (req, res, next) => {
   });
 };
 
+const uploadAvatar = async (req, res, next) => {
+  const { user, file } = req;
+  const url = await uploadFile(file);
+  const result = await authModel.updateUserInfo(user.id, { profile_picture: url.Location });
+  if (!result) {
+    throw new HttpError('server error', 500);
+  }
+  res.send({
+    url: url.Location
+  });
+};
+
+const checkFieldExist = async (req, res, next) => {
+  try {
+    const { user } = req;
+    const { fieldName, fieldValue } = req.body;
+    const result = await authModel.checkField({ [fieldName]: fieldValue });
+    if (result) {
+      throw new HttpError('Field exist in system', 402);
+    }
+    res.send({
+      status: 'success'
+    });
+  } catch (error) {
+    console.log(error);
+    throw new HttpError('server error', 500);
+  }
+};
+
+const changeEmailProfile = async (req, res, next) => {
+  try {
+    const { user } = req;
+    const { fieldName, fieldValue } = req.body;
+    const result = await authModel.updateUserInfo(user.id, { access_key_email: uuid() });
+    if (!result) {
+      throw new HttpError('server error', 500);
+    }
+    res.send({
+      status: 'success'
+    });
+  } catch (error) {
+    console.log(error);
+    throw new HttpError('server error', 500);
+  }
+};
+
 module.exports = {
   createUserAdmin,
   loginAdmin,
@@ -381,5 +429,8 @@ module.exports = {
   deleteUserById,
   updateUser,
   loginGoogleSSO,
-  refreshToken
+  refreshToken,
+  uploadAvatar,
+  checkFieldExist,
+  changeEmailProfile
 };

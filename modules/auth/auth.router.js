@@ -1,4 +1,5 @@
 const express = require('express');
+const { upload } = require('../../common/upload');
 const isAuth = require('../../middleware/auth');
 const authController = require('./auth.controller');
 
@@ -107,5 +108,7 @@ router.post('/update-user/:id', isAuth, authController.updateLockUser);
 router.post('/delete-user/:id', isAuth, authController.deleteUserById);
 router.post('/login-gg-sso', authController.loginGoogleSSO);
 router.post('/refresh-token', authController.refreshToken);
-
+router.post('/upload-avatar', isAuth, upload.single('file'), authController.uploadAvatar);
+router.post('/check-field-exist', isAuth, authController.checkFieldExist);
+router.post('/change-email-profile', isAuth, authController.changeEmailProfile);
 module.exports = router;
